@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(java -version)",
+      "Bash(unzip -l \"E:/Downloads/OKOK international.apk\")",
+      "Bash(mkdir -p \"E:/Documentos/app balança/apk_analysis\")",
+      "Bash(unzip -o \"E:/Downloads/OKOK international.apk\" -d \"E:/Documentos/app balança/apk_analysis/\")",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(flutter --version)",
+      "Bash(dart --version)",
+      "Bash(npm --version)",
+      "Bash(adb --version)",
+      "PowerShell(choco *)",
+      "PowerShell(winget search *)",
+      "PowerShell(winget install *)",
+      "Read(//c/jadx//**)",
+      "Read(//c/jadx/bin//**)",
+      "PowerShell(& \"C:\\\\jadx\\\\bin\\\\jadx.bat\" --version 2>&1)",
+      "PowerShell(& \"C:\\\\jadx\\\\bin\\\\jadx.bat\" --help 2>&1)",
+      "PowerShell(& \"C:\\\\jadx\\\\bin\\\\jadx.bat\" --no-res -j 2 -d \"E:\\\\Documentos\\\\app balan�a\\\\apk_analysis\\\\decompiled\" \"E:\\\\Downloads\\\\OKOK international.apk\" 2>&1)"
+    ]
+  }
+}

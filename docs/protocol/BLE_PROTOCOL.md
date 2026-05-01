@@ -1,174 +1,251 @@
 # BLE Protocol — OKOK International Scale (ChipSea)
 
-> Reverse-engineered from `OKOK international.apk` (com.chipsea.btcontrol)
+> Extraído diretamente do código-fonte descompilado via jadx.
+> Fontes: `chipseaStraightFrame.java`, `syncChipseaInstruction.java`, `BtGattAttr.java`
 
 ## Device overview
 
 | Field | Value |
 |-------|-------|
 | Brand | OKOK International |
-| SDK | com.chipsea.btcontrol (ChipSea) |
-| Communication | Bluetooth Low Energy (BLE / GATT) |
-| Measurements | Weight, Impedance, Body Fat %, Muscle %, Bone %, Water %, BMI |
+| Package | `com.chipsea.btcontrol` |
+| BLE lib | `com.chipsea.btlib` |
+| Measurements | Peso, Impedância, Gordura %, Músculo %, Osso, Água %, IMC, TMB, Gordura Visceral |
 
 ---
 
-## BLE Service & Characteristic UUIDs
+## BLE Service & Characteristic UUIDs (confirmados do código)
 
-The app supports multiple protocol variants. The device will advertise one of these services.
+Fonte: `BtGattAttr.java`
 
-### Protocol A — D618D (Primary ChipSea)
+### Protocolo principal — CHIPSEA/ISSC (FFF0)
 
-| Role | UUID |
-|------|------|
-| Service | `D618D000-6000-1000-8000-000000000000` |
-| Write   | `D618D001-6000-1000-8000-000000000000` |
-| Notify  | `D618D002-6000-1000-8000-000000000000` |
+| Role | UUID | Nome interno |
+|------|------|-------------|
+| Service | `0000fff0-0000-1000-8000-00805f9b34fb` | `CHIPSEA_SERVICE_UUID` / `ISSC_SERVICE_UUID` |
+| Write (RX) | `0000fff1-0000-1000-8000-00805f9b34fb` | `CHIPSEA_CHAR_RX_UUID` |
+| Notify (TX) | `0000fff2-0000-1000-8000-00805f9b34fb` | `CHIPSEA_CHAR_TX_UUID` |
 
-### Protocol B — FFF0 (Legacy / Fallback)
+### Protocolo JD (D618D)
 
-| Role | UUID |
-|------|------|
-| Service | `0000FFF0-0000-1000-8000-00805F9B34FB` |
-| Write   | `0000FFF1-0000-1000-8000-00805F9B34FB` |
-| Notify  | `0000FFF2-0000-1000-8000-00805F9B34FB` |
+| Role | UUID | Nome interno |
+|------|------|-------------|
+| Service | `D618D000-6000-1000-8000-000000000000` | `JD_SERVICE_UUID` |
+| Notify (TX) | `D618D001-6000-1000-8000-000000000000` | `JD_CHAR_TX_UUID` |
+| Write (RX) | `D618D002-6000-1000-8000-000000000000` | `JD_CHAR_RX_UUID` |
 
-### Protocol C — FFE0
+> **Atenção:** No protocolo JD, RX e TX estão invertidos! Write=D618D002, Notify=D618D001
 
-| Role | UUID |
-|------|------|
-| Service    | `0000FFE0-0000-1000-8000-00805F9B34FB` |
-| Notify/RW  | `0000FFE4-0000-1000-8000-00805F9B34FB` |
-
-### Protocol D — FAA0
+### Protocolo LX (A620)
 
 | Role | UUID |
 |------|------|
-| Service | `0000FAA0-0000-1000-8000-00805F9B34FB` |
-| Write   | `0000FAA1-0000-1000-8000-00805F9B34FB` |
-| Notify  | `0000FAA2-0000-1000-8000-00805F9B34FB` |
+| Service | `0000a602-0000-1000-8000-00805f9b34fb` |
+| UP_I    | `0000a620` |
+| UP_N (notify) | `0000a621` |
+| UP_ACK  | `0000a622` |
+| DOWN_WI | `0000a623` |
+| DOWN_WO | `0000a624` |
+| DOWN_ACK | `0000a625` |
 
-### Protocol E — A620 (Body Composition)
-
-| Role | UUID |
-|------|------|
-| Service | `0000A602-0000-1000-8000-00805F9B34FB` |
-| Write   | `0000A620-0000-1000-8000-00805F9B34FB` |
-| Notify  | `0000A621-0000-1000-8000-00805F9B34FB` |
-| Extra   | `0000A622` / `A623` / `A624` / `A625` |
-
-### Protocol F — FFA0
+### Protocolo LEAONE (FAA0)
 
 | Role | UUID |
 |------|------|
-| Service | `0000FFA0-0000-1000-8000-00805F9B34FB` |
-| Write   | `0000FFA1-0000-1000-8000-00805F9B34FB` |
-| Notify  | `0000FFA2-0000-1000-8000-00805F9B34FB` |
+| Service | `0000faa0-0000-1000-8000-00805f9b34fb` |
+| Write   | `0000faa1-0000-1000-8000-00805f9b34fb` |
+| Notify  | `0000faa2-0000-1000-8000-00805f9b34fb` |
 
-### Standard BLE Services also present
+### Standard BLE
 
-| Service | UUID | Purpose |
-|---------|------|---------|
-| Generic Access | `0000 1800` | Device name, appearance |
-| Current Time   | `0000 1805` | Time sync |
-| Device Info    | `0000 180A` | Manufacturer, model |
-| Heart Rate     | `0000 180D` | (unused in scale) |
-| Body Composition | `0000 181B` | Standard BLE body comp |
+| UUID | Propósito |
+|------|----------|
+| `00002902-0000-1000-8000-00805f9b34fb` | CCCD — habilitar notificações |
+| `0000181b-0000-1000-8000-00805f9b34fb` | Body Composition Service (padrão BLE SIG) |
+| `00002a9c-0000-1000-8000-00805f9b34fb` | Body Composition Measurement |
+| `0000fa9c-0000-1000-8000-00805f9b34fb` | Body Composition History |
+| `00001805-0000-1000-8000-00805f9b34fb` | Current Time Service |
+| `00002a08-0000-1000-8000-00805f9b34fb` | Current Time Characteristic |
 
 ---
 
-## Communication flow
+## Frame header
+
+Todos os pacotes (enviados e recebidos) começam com `0xCA` (byte[0]).
+
+Em Java: `-54` (signed) = `0xCA` (unsigned).
+
+---
+
+## Pacotes recebidos da balança (Notify)
+
+Fonte: `chipseaStraightFrame.java` — método `process()`
+
+### Versão 0x10 — Tipo 0x10 (medição com composição corporal)
 
 ```
-App                              Scale
- |                                 |
- |--- BLE scan & connect -------->|
- |<-- GATT services discovered ---|
- |                                 |
- |--- Enable notify on char ------>|  (write 0x0100 to CCCD 0x2902)
- |                                 |
- |--- Send user profile cmd ------>|  height, age, gender, unit
- |                                 |
- |    [user steps on scale]        |
- |<-- Real-time weight (unstable)--|  streaming during weighing
- |<-- Final weight (stable) -------|  when measurement locks
- |<-- Impedance result ------------|  BIA measurement
- |                                 |
- |  [app calculates body comp]     |  BMI/fat/muscle calculated client-side
+Byte[0]  = 0xCA        header
+Byte[1]  = 0x10        versão
+Byte[2]  = length
+Byte[3]  = device type
+Byte[4]  = cmdId / scaleProperty
+             → cmdId = BytesUtil.getCmdId(scaleProperty)
+             → cmdId > 0 significa composição corporal disponível
+Byte[5..6] = peso raw  → WeightUnitUtil.Parser(b5, b6, scaleProperty)
+             → weight_kg = parserResult.kgWeight
+Byte[7..8]  = gordura corporal (axunge)  → bytesToInt(bytes)
+Byte[9..10] = água (water)               → bytesToInt(bytes)
+Byte[11..12]= músculo (muscle)           → bytesToInt(bytes)
+Byte[13..14]= TMB (BMR)                  → bytesToInt(bytes)
+Byte[15..16]= gordura visceral           → bytesToInt(bytes)
+Byte[17]    = osso (bone)                → bytesToInt(bytes)
+```
+
+### Versão 0x11 — Tipo 0x00 ou 0x01 (peso simples / peso estável)
+
+```
+Byte[0]  = 0xCA
+Byte[1]  = 0x11
+Byte[2]  = length
+Byte[3]  = lockFlag (0=medindo, 1=estável)
+Byte[4]  = ? (ignorado)
+Byte[5..6] = peso raw
+Byte[7..11] = ?
+Byte[11] = scaleProperty
+```
+
+### Flags do `scaleProperty`
+
+`scaleProperty` é um byte de flags que contém:
+- Unidade (kg / lb / jin / st)
+- Número de casas decimais
+- Estado do lock
+
+Extraído por `BytesUtil.getUnit()`, `BytesUtil.getDigit()`, `BytesUtil.getCmdId()`.
+
+---
+
+## Comandos enviados para a balança (Write)
+
+Fonte: `syncChipseaInstruction.java`
+
+### Enviar perfil do usuário — v10 (0xCA 0x10)
+
+```
+Byte[0]  = 0xCA
+Byte[1]  = 0x10        versão
+Byte[2]  = 0x0E        length (14)
+Byte[3]  = 0x01        type
+Byte[4]  = year (2 dígitos, ex: 25 para 2025)
+Byte[5]  = month (1-12)
+Byte[6]  = day
+Byte[7]  = hour
+Byte[8]  = minute
+Byte[9]  = second
+Byte[10..13] = userId (int32, big-endian)
+Byte[14] = sex (byte) — ver codificação abaixo
+Byte[15] = age (anos, calculado a partir da data de nascimento)
+Byte[16] = height (cm)
+Byte[17] = XOR checksum de Byte[1..16]
+Byte[18] = 0x00
+Byte[19] = 0x00
+```
+
+### Enviar perfil do usuário — v11 (0xCA 0x11) para 1 usuário
+
+```
+Byte[0]  = 0xCA
+Byte[1]  = 0x11        versão
+Byte[2]  = 0x10        length (16)
+Byte[3]  = 0x10        type
+Byte[4]  = 0x11        package field (1 pacote de 1)
+Byte[5..8] = timestamp Unix (int32)
+Byte[9]  = 0x00
+Byte[10] = 0x00
+Byte[11..14] = roleId (int32)
+Byte[15] = sex+age  → (sex==male ? age|0x80 : age&0x7F)
+Byte[16] = height (cm)
+Byte[17..18] = weight (short, peso alvo em 0.1kg)
+Byte[19] = XOR checksum de Byte[1..18]
+```
+
+### Codificação sex+age (mergeSexAndAge)
+
+```
+male   → age | 0x80     (bit 7 = 1)
+female → age & 0x7F     (bit 7 = 0)
+```
+
+### Selecionar usuário ativo
+
+```
+Byte[0]  = 0xCA
+Byte[1]  = 0x11
+Byte[2]  = 0x05
+Byte[3]  = 0x15        (NAK = 21)
+Byte[4..7] = userId (int32)
+Byte[8]  = XOR checksum de Byte[1..7]
+```
+
+### Solicitar histórico
+
+```
+Byte[0]  = 0xCA
+Byte[1]  = 0x11
+Byte[2]  = 0x02
+Byte[3]  = 0x11
+Byte[4]  = 0x01
+Byte[5]  = XOR checksum de Byte[1..4]
+Byte[6..19] = 0x00
 ```
 
 ---
 
-## Command structure (Protocol FFF0 / D618D)
+## Cálculo de peso (WeightUnitUtil)
 
-> Full byte-level protocol to be documented after deeper decompilation.
-> See `reverse_engineering/` folder for raw byte captures.
-
-### Send user profile
-
-Sent before or during measurement to allow impedance-based body composition.
+O peso raw de 2 bytes é interpretado assim:
 
 ```
-Byte[0]  = 0xFF (header)
-Byte[1]  = command type  (0x12 = set user info)
-Byte[2]  = unit (0x00 = kg, 0x01 = lb, 0x02 = jin/catty)
-Byte[3]  = height (cm, e.g. 175)
-Byte[4]  = age (years)
-Byte[5]  = gender (0x00 = female, 0x01 = male)
-Byte[6]  = checksum (XOR of bytes 1..5)
-```
+weight_raw = (byte[high] << 8) | byte[low]
 
-### Weight data notification
+if digit == ONE:
+  weight_display = weight_raw / 10.0   (ex: 750 → 75.0 kg)
+if digit == TWO:
+  weight_display = weight_raw / 100.0
 
-Scale sends weight packets while measurement is in progress.
-
-```
-Byte[0]  = 0xFF (header)
-Byte[1]  = status (0x01 = measuring, 0x02 = stable, 0x03 = impedance done)
-Byte[2]  = unit   (0x00 = kg, 0x01 = lb, 0x02 = jin)
-Byte[3]  = weight high byte
-Byte[4]  = weight low byte
-  → weight_raw = (Byte[3] << 8) | Byte[4]
-  → weight_kg  = weight_raw / 10.0   (e.g. 0x02EE = 750 = 75.0 kg)
-Byte[5]  = impedance high byte   (0x00 when still measuring)
-Byte[6]  = impedance low byte
-  → impedance_ohm = (Byte[5] << 8) | Byte[6]
-Byte[7]  = checksum
+Conversões de unidade:
+  jin → kg:  peso * 0.5
+  lb  → kg:  peso * 0.4535924
+  st  → lb:  strôes × 14 + libras_decimais
 ```
 
 ---
 
-## Body composition calculation
+## Composição corporal (calculada pelo app)
 
-Impedance is measured by the scale hardware. Body fat % and other metrics are
-**calculated by the app** using the Deurenberg / ChipSea formulas, not by the scale itself.
+Os valores de gordura/músculo/osso/água/TMB/visceral são recebidos da balança
+(não calculados pelo app) no protocolo versão 0x10.
 
-Inputs: weight (kg), height (cm), age (years), gender, impedance (Ω)
+Escala dos valores recebidos:
+- Gordura (axunge), Água, Músculo: `valor / 10.0 → percentual`
+- TMB (BMR): `valor` em kcal
+- Gordura Visceral: índice (tipicamente 1-50)
+- Osso: `valor / 10.0` em kg
 
-Derived metrics:
-- **BMI** = weight / (height_m²)
-- **Body Fat %** — formula varies by gender/age, uses impedance
-- **Muscle Mass** — derived from lean body mass
-- **Bone Mass** — derived from weight/lean mass ratio
-- **Body Water %** — approximated from lean mass
-- **Visceral Fat** — index based on waist estimate / age / gender
-- **Basal Metabolic Rate (BMR)** — Harris–Benedict or Mifflin–St Jeor
-
----
-
-## TODO — needs BLE capture to confirm
-
-- [ ] Exact byte layout for D618D protocol commands
-- [ ] Exact checksum algorithm (XOR vs sum vs CRC)
-- [ ] Impedance measurement trigger byte
-- [ ] Time sync command format
-- [ ] History/data sync command (if any)
-- [ ] Confirm unit encoding values
+O músculo é calculado como percentual na leitura:
+```java
+muscle_pct = (muscle / weight) * 100
+if (muscle_pct >= 50) muscle_pct = min(muscle_as_raw, 50)
+fatScale.setMuscle((int)(muscle_pct * 10))
+```
 
 ---
 
-## References
+## Checksum
 
-- APK: `OKOK international.apk` — package `com.chipsea.btcontrol`
-- BLE CCCD UUID: `00002902-0000-1000-8000-00805F9B34FB`
-- Standard Body Composition Service: UUID `0x181B` (Bluetooth SIG)
+XOR de todos os bytes no intervalo especificado:
+```
+xor = byte[start] ^ byte[start+1] ^ ... ^ byte[end]
+```
+
+Implementado em `BytesUtil.getDatasXor(bArr, startIdx, length)`.
