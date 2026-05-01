@@ -1,0 +1,41 @@
+name: balanca_app
+description: App personalizado para balança BLE OKOK International / ChipSea
+
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # BLE communication
+  flutter_blue_plus: ^1.35.3
+
+  # Local database for weight history
+  sqflite: ^2.4.1
+  path: ^1.9.0
+
+  # State management
+  riverpod: ^2.6.1
+  flutter_riverpod: ^2.6.1
+
+  # Charts for weight trends
+  fl_chart: ^0.70.2
+
+  # Shared preferences for user settings
+  shared_preferences: ^2.3.3
+
+  # Date formatting
+  intl: ^0.20.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
