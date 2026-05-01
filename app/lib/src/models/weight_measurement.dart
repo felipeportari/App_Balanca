@@ -1,10 +1,12 @@
 class WeightMeasurement {
+  final int? id;
   final DateTime timestamp;
   final double weightKg;
   final int? impedanceOhm;
   final BodyComposition? bodyComposition;
 
   const WeightMeasurement({
+    this.id,
     required this.timestamp,
     required this.weightKg,
     this.impedanceOhm,
@@ -29,6 +31,7 @@ class WeightMeasurement {
 
   factory WeightMeasurement.fromMap(Map<String, dynamic> map) {
     return WeightMeasurement(
+      id: map['id'] as int?,
       timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp'] as int),
       weightKg: (map['weight_kg'] as num).toDouble(),
       impedanceOhm: map['impedance_ohm'] as int?,

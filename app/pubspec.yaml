@@ -26,8 +26,6 @@ dependencies:
   # Charts for weight trends
   fl_chart: ^0.70.2
 
-  # Shared preferences for user settings
-  shared_preferences: ^2.3.3
 
   # Date formatting
   intl: ^0.20.1

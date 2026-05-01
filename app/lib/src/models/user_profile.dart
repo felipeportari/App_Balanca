@@ -32,7 +32,6 @@ class UserProfile {
     );
   }
 
-  // Byte encoding for scale BLE command (to be confirmed via BLE capture)
   int get genderByte => gender == Gender.male ? 0x01 : 0x00;
   int get unitByte {
     switch (unit) {
@@ -41,4 +40,21 @@ class UserProfile {
       case WeightUnit.jin: return 0x02;
     }
   }
+
+  Map<String, dynamic> toMap() => {
+    'id': 1,
+    'height_cm': heightCm,
+    'age_years': ageYears,
+    'gender': gender.name,
+    'weight_unit': unit.name,
+    'target_weight_kg': targetWeightKg,
+  };
+
+  factory UserProfile.fromMap(Map<String, dynamic> map) => UserProfile(
+    heightCm: map['height_cm'] as int,
+    ageYears: map['age_years'] as int,
+    gender: Gender.values.firstWhere((g) => g.name == map['gender']),
+    unit: WeightUnit.values.firstWhere((u) => u.name == map['weight_unit']),
+    targetWeightKg: (map['target_weight_kg'] as num?)?.toDouble(),
+  );
 }
