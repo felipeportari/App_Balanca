@@ -1,0 +1,14 @@
+apk_analysis/
+*.apk
+node_modules/
+.env
+*.log
+dist/
+build/
+.gradle/
+.idea/
+*.iml
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
